@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>The Dossier — Declassified Conspiracy Files</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080c04;--bg2:#0c1008;--bg3:#111808;--bg4:#162010;
+  --green:#7dc843;--green-dim:#4a7a28;--green-muted:#2a4a14;
+  --text:#c8d8a0;--text-dim:#8aaa60;--text-faint:#4a6a2a;
+  --border:#1e2e10;--border2:#2a3e18;--red:#c0392b;--amber:#c8a020;
+  --font:'Courier New',Courier,monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;font-size:13px;line-height:1.6}
+
+/* HEADER */
+header{
+  background:var(--bg2);border-bottom:2px solid var(--border2);
+  padding:18px 28px;display:flex;align-items:center;gap:16px;
+  position:sticky;top:0;z-index:100;
+}
+.logo-block{flex:1}
+.logo{font-size:20px;font-weight:700;color:var(--green);letter-spacing:5px}
+.logo-sub{font-size:9px;color:var(--text-faint);letter-spacing:3px;margin-top:3px}
+.stamp{
+  font-size:10px;font-weight:700;color:var(--red);
+  border:2px solid var(--red);padding:5px 11px;
+  letter-spacing:3px;transform:rotate(-4deg);opacity:.85;flex-shrink:0;
+}
+.file-count-badge{
+  background:var(--green-muted);color:var(--green);
+  font-size:10px;letter-spacing:2px;padding:5px 12px;
+  border:1px solid var(--green-dim);flex-shrink:0;
+}
+
+/* STATUS BAR */
+.status-bar{
+  background:var(--bg);border-bottom:1px solid var(--border);
+  padding:6px 28px;display:flex;align-items:center;gap:10px;
+  font-size:9px;color:var(--amber);letter-spacing:2px;
+  min-height:28px;
+}
+.pulse{width:7px;height:7px;background:var(--amber);border-radius:50%;flex-shrink:0;animation:pulse 1.2s ease-in-out infinite}
+.pulse.done{background:var(--green);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.15}}
+#statusText{flex:1}
+.progress-bar-wrap{width:120px;height:4px;background:var(--bg4);border:1px solid var(--border);overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--amber);transition:width .4s ease}
+.progress-bar-fill.done{background:var(--green)}
+
+/* CONTROLS */
+.controls{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:12px 28px;display:flex;flex-direction:column;gap:10px;
+}
+.search-row{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg3);border:1px solid var(--border2);padding:9px 14px;
+}
+.search-icon{color:var(--green-dim);font-size:16px;flex-shrink:0}
+#searchInput{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:var(--font);font-size:12px;letter-spacing:1px;
+}
+#searchInput::placeholder{color:var(--text-faint)}
+.clear-btn{
+  background:none;border:none;color:var(--text-faint);
+  cursor:pointer;font-size:14px;display:none;font-family:var(--font);padding:0;
+}
+.clear-btn.vis{display:block}.clear-btn:hover{color:var(--red)}
+.cats{display:flex;gap:6px;flex-wrap:wrap}
+.cat-btn{
+  font-size:8px;letter-spacing:2px;padding:4px 12px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--text-faint);cursor:pointer;font-family:var(--font);transition:all .15s;
+}
+.cat-btn:hover{border-color:var(--green-dim);color:var(--text-dim)}
+.cat-btn.active{border-color:var(--green);color:var(--green);background:var(--green-muted)}
+.sort-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.sort-label{font-size:9px;color:var(--text-faint);letter-spacing:2px}
+.sort-btn{
+  font-size:10px;font-family:var(--font);color:var(--text-faint);
+  background:transparent;border:none;cursor:pointer;letter-spacing:1px;transition:color .15s;padding:2px 0;
+}
+.sort-btn:hover{color:var(--text-dim)}.sort-btn.active{color:var(--green);text-decoration:underline}
+.result-count{margin-left:auto;font-size:9px;color:var(--text-faint);letter-spacing:1px}
+
+/* STATS ROW */
+.stats-row{
+  display:flex;gap:12px;flex-wrap:wrap;padding:10px 28px;
+  background:var(--bg);border-bottom:1px solid var(--border);
+}
+.stat-pill{
+  font-size:8px;letter-spacing:2px;padding:4px 10px;
+  border:1px solid var(--border2);color:var(--text-faint);
+}
+.stat-pill span{color:var(--green);font-weight:700}
+
+/* MAIN */
+main{max-width:1100px;margin:0 auto;padding:20px 28px 80px}
+.theory-list{display:flex;flex-direction:column;gap:8px}
+
+/* CARDS */
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden;
+}
+.card:hover{border-color:var(--border2);background:var(--bg3)}
+.card.open{border-color:var(--green-dim);background:var(--bg3)}
+.card-header{padding:14px 18px;display:flex;align-items:flex-start;gap:14px}
+.card-main{flex:1;min-width:0}
+.card-top{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
+.cat-badge{font-size:7px;letter-spacing:2px;padding:2px 7px;font-weight:700;flex-shrink:0}
+.year-tag{font-size:8px;color:var(--text-faint);letter-spacing:2px}
+.wiki-tag{font-size:7px;color:var(--text-faint);letter-spacing:1px;opacity:.6}
+.card-title{font-size:14px;font-weight:700;color:#daeaaa;letter-spacing:.5px;line-height:1.4}
+.card-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:7px}
+.meter-group{display:flex;align-items:center;gap:7px}
+.meter-label{font-size:7px;color:var(--text-faint);letter-spacing:2px}
+.meter-bar{width:90px;height:5px;background:var(--bg4);border:1px solid var(--border);overflow:hidden}
+.meter-fill{height:100%;transition:width .5s ease}
+.meter-score{font-size:10px;font-weight:700;letter-spacing:1px;min-width:75px}
+.chevron{
+  color:var(--green-dim);font-size:13px;flex-shrink:0;
+  margin-top:3px;transition:transform .2s;user-select:none;
+}
+.card.open .chevron{transform:rotate(90deg)}
+
+/* EXPANDED */
+.card-body{
+  display:none;padding:0 18px 16px;
+  border-top:1px solid var(--border);margin:0 18px;
+}
+.card.open .card-body{display:block}
+.card-desc{
+  font-size:12px;color:#9ab870;line-height:1.85;
+  padding:14px 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px;
+}
+.sources-head{
+  font-size:8px;letter-spacing:3px;color:var(--text-faint);
+  margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.sources-head::after{content:'';flex:1;height:1px;background:var(--border)}
+.source-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.source-bullet{color:var(--green);flex-shrink:0;margin-top:2px;font-size:10px}
+.source-text{font-size:11px;color:var(--text-dim);line-height:1.5}
+.source-link{
+  color:var(--green);text-decoration:none;font-size:10px;
+  letter-spacing:1px;margin-left:6px;white-space:nowrap;
+  cursor:pointer;
+}
+.source-link:hover{text-decoration:underline}
+.wiki-read-link{
+  display:inline-flex;align-items:center;gap:5px;
+  color:var(--green);text-decoration:none;font-size:9px;
+  letter-spacing:1px;margin-top:10px;border:1px solid var(--green-dim);
+  padding:4px 10px;transition:background .15s;cursor:pointer;
+}
+.wiki-read-link:hover{background:var(--green-muted)}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}
+.tag{font-size:7px;letter-spacing:1.5px;padding:2px 8px;border:1px solid var(--border2);color:var(--text-faint)}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;color:var(--text-faint);letter-spacing:3px;font-size:11px}
+.empty-icon{font-size:34px;margin-bottom:14px;display:block}
+
+/* LOAD MORE */
+.load-more-wrap{text-align:center;margin-top:20px}
+.load-more-btn{
+  padding:12px 30px;background:transparent;
+  border:1px solid var(--border2);color:var(--text-faint);
+  font-family:var(--font);font-size:9px;letter-spacing:3px;
+  cursor:pointer;transition:all .15s;
+}
+.load-more-btn:hover{border-color:var(--green-dim);color:var(--green)}
+.load-more-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--border);padding:14px 28px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:var(--bg2);font-size:8px;color:var(--text-faint);
+  letter-spacing:2px;flex-wrap:wrap;gap:6px;
+}
+.footer-dot{color:var(--green-dim);margin:0 6px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  header{padding:14px 16px}
+  .controls,.stats-row{padding:10px 16px}
+  .status-bar{padding:6px 16px}
+  main{padding:14px 16px 60px}
+  .meter-bar{width:60px}
+  .card-header{padding:12px 14px}
+  .card-body{margin:0 14px;padding:0 0 12px}
+  footer{padding:10px 16px;flex-direction:column;text-align:center}
+  .logo{font-size:16px;letter-spacing:3px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-block">
+    <div class="logo">▣ THE DOSSIER</div>
+    <div class="logo-sub">RESTRICTED ACCESS — LIVE INTELLIGENCE FEED — WIKIPEDIA OPEN SOURCE</div>
+  </div>
+  <span class="file-count-badge" id="totalBadge">LOADING...</span>
+  <div class="stamp">CLASSIFIED</div>
+</header>
+
+<div class="status-bar" id="statusBar">
+  <div class="pulse" id="pulseEl"></div>
+  <span id="statusText">ESTABLISHING SECURE CONNECTION TO INTELLIGENCE ARCHIVES...</span>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div class="controls">
+  <div class="search-row">
+    <span class="search-icon">⌕</span>
+    <input id="searchInput" type="text" placeholder="SEARCH THEORIES, TAGS, KEYWORDS..." oninput="onSearch()"/>
+    <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="cats" id="catBar"></div>
+  <div class="sort-row">
+    <span class="sort-label">SORT BY:</span>
+    <button class="sort-btn active" id="sortCred" onclick="setSort('cred')">CREDIBILITY</button>
+    <button class="sort-btn" id="sortYear" onclick="setSort('year')">YEAR</button>
+    <button class="sort-btn" id="sortAlpha" onclick="setSort('alpha')">A–Z</button>
+    <span class="result-count" id="resultCount"></span>
+  </div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<main>
+  <div class="theory-list" id="theoryList"></div>
+  <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+    <button class="load-more-btn" id="loadMoreBtn" onclick="loadNextBatch()">[ DECRYPT MORE FILES ↓ ]</button>
+  </div>
+</main>
+
+<footer>
+  <span>ALL ENTRIES SOURCED FROM WIKIPEDIA OPEN KNOWLEDGE BASE</span>
+  <span><span class="footer-dot">◆</span>LIVE FEED — JUN 2026<span class="footer-dot">◆</span></span>
+  <span>NOT AFFILIATED WITH ANY GOVERNMENT ENTITY</span>
+</footer>
+
+<script>
+/* ─────────────────────────────────────────
+   CATEGORY SYSTEM
+───────────────────────────────────────── */
+const CAT_COLORS={
+  Government:  {bg:"#162a08",border:"#2a5010",text:"#7dc843"},
+  Military:    {bg:"#281408",border:"#503010",text:"#e08042"},
+  Surveillance:{bg:"#180828",border:"#3a1050",text:"#b042e0"},
+  Medical:     {bg:"#081828",border:"#104060",text:"#42b4d4"},
+  Corporate:   {bg:"#281e08",border:"#504010",text:"#d4b042"},
+  Technology:  {bg:"#082018",border:"#105030",text:"#42d4a0"},
+  Historical:  {bg:"#20100a",border:"#50280a",text:"#d48842"},
+  Science:     {bg:"#080828",border:"#101060",text:"#8080f0"},
+  Political:   {bg:"#200820",border:"#501050",text:"#d042d0"},
+  Financial:   {bg:"#182000",border:"#405000",text:"#a0c020"},
+  Other:       {bg:"#181818",border:"#303030",text:"#a0a0a0"}
+};
+const CATS=["All","Government","Military","Surveillance","Medical","Corporate","Technology","Historical","Science","Political","Financial","Other"];
+
+/* ─────────────────────────────────────────
+   WIKIPEDIA PAGE QUEUE — 100+ entries
+───────────────────────────────────────── */
+const WIKI_QUEUE=[
+  "MKUltra","COINTELPRO","Operation_Northwoods","Tuskegee_syphilis_experiment",
+  "PRISM_(surveillance_program)","Operation_Paperclip","Iran–Contra_affair",
+  "Gulf_of_Tonkin_incident","Tobacco_Master_Settlement_Agreement","ECHELON",
+  "Project_ARTICHOKE","Operation_Mockingbird","Church_Committee","Watergate_scandal",
+  "Pentagon_Papers","Phoenix_Program","Operation_Gladio","Operation_Ajax",
+  "Operation_PBSUCCESS","Operation_Condor","Extraordinary_rendition_by_the_United_States",
+  "Abu_Ghraib_torture_and_prisoner_abuse","NSA_warrantless_surveillance_(2001–2007)",
+  "Total_Information_Awareness","XKeyscore","Boundless_Informant",
+  "MUSCULAR_(surveillance_program)","Room_641A","Carnivore_(software)",
+  "Five_Eyes","UKUSA_Agreement","Project_Minaret","Venona_project",
+  "Julius_and_Ethel_Rosenberg","Alger_Hiss","McCarthyism","Hollywood_blacklist",
+  "Stargate_Project","Remote_viewing","Project_Blue_Book","Majestic_12",
+  "Roswell_UFO_incident","Area_51","Chemtrail_conspiracy_theory","HAARP",
+  "Federal_Reserve_System","Bilderberg_Group","Council_on_Foreign_Relations",
+  "Skull_and_Bones","Bohemian_Grove","Trilateral_Commission","Illuminati",
+  "New_World_Order_(conspiracy_theory)","Deep_state_in_the_United_States",
+  "False_flag","Jonestown","Heaven's_Gate_(religious_group)",
+  "Gary_Webb","Kerry_Committee_report","Fluoride_controversy",
+  "Moon_landing_conspiracy_theories","9/11_conspiracy_theories",
+  "JFK_assassination_conspiracy_theories",
+  "Martin_Luther_King_Jr._assassination_conspiracy_theories",
+  "Robert_F._Kennedy_assassination","Waco_siege","Ruby_Ridge",
+  "Oklahoma_City_bombing","TWA_Flight_800","Pan_Am_Flight_103",
+  "Senate_Intelligence_Committee_report_on_CIA_torture",
+  "Enhanced_interrogation_techniques","Black_site",
+  "Facebook–Cambridge_Analytica_data_scandal","Palantir_Technologies",
+  "Pegasus_(spyware)","NSO_Group","FinFisher","Hacking_Team",
+  "Zersetzung","Stasi","Operation_Snow_White","Operation_Freakout",
+  "Project_MKSearch","Project_Bluebird","Project_CHATTER",
+  "MKULTRA_Subproject_68","Operation_Sea-Spray","Edgewood_Arsenal_experiments",
+  "Unit_731","Aum_Shinrikyo","Tokyo_subway_sarin_attack",
+  "Operation_Ranch_Hand","Agent_Orange","Napalm",
+  "CANDU_reactor_cover-up","Karen_Silkwood","Downwinder",
+  "Radium_Girls","Erin_Brockovich","Love_Canal",
+  "Bhopal_disaster","Enron_scandal","Volkswagen_emissions_scandal",
+  "Theranos","Bernie_Madoff","LIBOR_scandal",
+  "Iran_hostage_crisis","Operation_Eagle_Claw","Iran_Air_Flight_655",
+  "USS_Liberty_incident","Operation_Wrath_of_God","Black_September_organization",
+  "Munich_massacre","Operation_Anthropoid","Operation_Bernhard",
+  "Operation_Mincemeat","Operation_Bodyguard","Operation_Overlord",
+  "Manhattan_Project","Operation_Sunshine","Operation_Plowshare",
+  "Project_Sunshine","Operation_Top_Hat","Operation_Whitecoat",
+  "Dugway_proving_ground","Fort_Detrick","Plum_Island_Animal_Disease_Center",
+  "Sverdlovsk_anthrax_leak","Marburg_virus","Coronavirus_lab_leak_hypothesis",
+  "DARPA","In-Q-Tel","Lifelog","LifeLog","Project_Camelot_(research)",
+  "Operation_Chaos","Project_RESISTANCE","Clandestine_HUMINT",
+  "Signals_intelligence","Tempest_(codename)","Clipper_chip",
+  "Crypto_AG","Minerva_Research_Initiative","Human_terrain_system"
+];
+
+/* ─────────────────────────────────────────
+   HAND-CURATED SEED ENTRIES (always shown first)
+───────────────────────────────────────── */
+const SEEDED=[
+  {id:"s1",title:"MKUltra Mind Control Program",cat:"Government",year:1953,credibility:92,
+   wikiSlug:"MKUltra",seeded:true,
+   desc:"The CIA covertly ran illegal experiments on U.S. and Canadian citizens using LSD, hypnosis, electroshock, and psychological manipulation to develop mind-control techniques during the Cold War. Originally dismissed as conspiracy theory, it was fully confirmed via declassified documents released under FOIA in 1977.",
+   sources:[
+     {text:"Church Committee Senate Report (1975)",url:"https://www.intelligence.senate.gov/sites/default/files/94755_II.pdf"},
+     {text:"CIA FOIA MKUltra Declassified Documents",url:"https://www.cia.gov/readingroom/collection/mkultra-declassified-documents"},
+     {text:"New York Times — CIA Mind Control Data (Aug 2, 1977)",url:"https://www.nytimes.com/1977/08/02/archives/cia-data-show-14-year-project-on-controlling-human-behavior.html"}
+   ],
+   tags:["CIA","Cold War","Proven","Human Experimentation","FOIA"]},
+
+  {id:"s2",title:"Operation Northwoods — False Flag Blueprint",cat:"Military",year:1962,credibility:96,
+   wikiSlug:"Operation_Northwoods",seeded:true,
+   desc:"A 1962 U.S. Department of Defense proposal to stage false flag terrorist attacks on American citizens and military assets to justify war against Cuba. Plans included shooting down a civilian airliner and blaming Cuba. JFK rejected it. Fully declassified in 1997.",
+   sources:[
+     {text:"Declassified DoD Memo via National Security Archive",url:"https://nsarchive2.gwu.edu/news/20010430/northwoods.pdf"},
+     {text:"ABC News — Operation Northwoods (2001)",url:"https://abcnews.go.com/US/story?id=92745"}
+   ],
+   tags:["DoD","False Flag","Cuba","Declassified","JFK","Military"]},
+
+  {id:"s3",title:"COINTELPRO — FBI Domestic Surveillance",cat:"Government",year:1956,credibility:98,
+   wikiSlug:"COINTELPRO",seeded:true,
+   desc:"From 1956 to 1971, the FBI ran covert programs to surveil, infiltrate, discredit, and disrupt domestic political organizations including Martin Luther King Jr., the Black Panther Party, and feminist groups. Fully confirmed and exposed by the Church Committee.",
+   sources:[
+     {text:"FBI Vault — COINTELPRO Documents",url:"https://vault.fbi.gov/cointel-pro"},
+     {text:"Church Committee Final Report Vol. 3 (1976)",url:"https://www.intelligence.senate.gov/sites/default/files/94755_III.pdf"}
+   ],
+   tags:["FBI","Surveillance","Civil Rights","Proven","MLK","Domestic"]},
+
+  {id:"s4",title:"Tuskegee Syphilis Experiment",cat:"Medical",year:1932,credibility:99,
+   wikiSlug:"Tuskegee_syphilis_experiment",seeded:true,
+   desc:"For 40 years, the U.S. Public Health Service conducted experiments on 399 Black men with syphilis in Alabama, deliberately withholding treatment even after penicillin became standard of care. Participants were misled about their condition. Exposed in 1972, it led to sweeping bioethics reform.",
+   sources:[
+     {text:"CDC Tuskegee Study Documentation",url:"https://www.cdc.gov/tuskegee/index.html"},
+     {text:"Tuskegee Syphilis Study Legacy Committee (1996)",url:"https://bioethicsarchive.georgetown.edu/achre/report.html"}
+   ],
+   tags:["PHS","Medical Ethics","Proven","Race","Landmark","Alabama"]},
+
+  {id:"s5",title:"NSA PRISM Global Surveillance Program",cat:"Surveillance",year:2007,credibility:98,
+   wikiSlug:"PRISM_(surveillance_program)",seeded:true,
+   desc:"The NSA collected internet communications data directly from servers of major tech companies including Google, Apple, Facebook, Microsoft, and Skype under a secret court order. Revealed by Edward Snowden to The Guardian and Washington Post in 2013.",
+   sources:[
+     {text:"The Guardian — NSA Prism Program (Greenwald, 2013)",url:"https://www.theguardian.com/world/2013/jun/06/us-tech-giants-nsa-data"},
+     {text:"Washington Post — PRISM Original Report (2013)",url:"https://www.washingtonpost.com/investigations/us-intelligence-mining-data-from-nine-us-internet-companies-in-broad-secret-program/2013/06/06/3a0c0da8-cebf-11e2-8845-d970ccb04497_story.html"}
+   ],
+   tags:["NSA","Snowden","Surveillance","Internet","Confirmed","Five Eyes"]},
+
+  {id:"s6",title:"Operation Paperclip — Nazi Scientists Recruited",cat:"Government",year:1945,credibility:95,
+   wikiSlug:"Operation_Paperclip",seeded:true,
+   desc:"After WWII, the U.S. Office of Strategic Services secretly recruited over 1,600 Nazi scientists, engineers, and intelligence officers for Cold War programs — bypassing a ban on employing war criminals. NASA rocket pioneer Wernher von Braun was among those brought in.",
+   sources:[
+     {text:"National Security Archive — Operation Paperclip",url:"https://nsarchive.gwu.edu/briefing-book/intelligence/2016-04-14/operation-paperclip"},
+     {text:"Annie Jacobsen, 'Operation Paperclip' (Little, Brown, 2014)",url:"https://www.hachettebookgroup.com/titles/annie-jacobsen/operation-paperclip/9780316221030/"}
+   ],
+   tags:["OSS","NASA","Cold War","WWII","Confirmed","War Crimes"]},
+
+  {id:"s7",title:"Iran-Contra Secret Arms Deal",cat:"Government",year:1986,credibility:99,
+   wikiSlug:"Iran–Contra_affair",seeded:true,
+   desc:"Senior Reagan administration officials secretly sold weapons to Iran — then under a U.S. arms embargo — and illegally diverted proceeds to fund Nicaraguan Contra rebels in defiance of Congressional ban. Exposed in 1986; led to multiple convictions and a constitutional crisis.",
+   sources:[
+     {text:"Tower Commission Report (1987)",url:"https://babel.hathitrust.org/cgi/pt?id=umn.31951d02055905n"},
+     {text:"Congressional Iran-Contra Report (1987)",url:"https://www.washingtonpost.com/wp-srv/politics/special/clinton/frenzy/iran.htm"}
+   ],
+   tags:["Reagan","CIA","Weapons","Congress","Proven","Nicaragua"]},
+
+  {id:"s8",title:"Gulf of Tonkin — Fabricated War Pretext",cat:"Military",year:1964,credibility:90,
+   wikiSlug:"Gulf_of_Tonkin_incident",seeded:true,
+   desc:"Declassified NSA documents released in 2005 revealed the second alleged North Vietnamese attack in the Gulf of Tonkin likely never occurred, yet the fabricated incident was used to justify massive escalation in Vietnam.",
+   sources:[
+     {text:"NSA Historian Hanyok — 'Skunks, Bogies, Silent Hounds' (2005)",url:"https://nsarchive2.gwu.edu/NSAEBB/NSAEBB132/reup.htm"},
+     {text:"NY Times — NSA Vietnam Docs (2005)",url:"https://www.nytimes.com/2005/11/30/politics/vietnam-war-intelligence-deliberately-skewed-secret-study.html"}
+   ],
+   tags:["Vietnam","NSA","False Flag","Declassified","Military","LBJ"]},
+
+  {id:"s9",title:"Big Tobacco Hidden Cancer Research",cat:"Corporate",year:1953,credibility:97,
+   wikiSlug:"Tobacco_Master_Settlement_Agreement",seeded:true,
+   desc:"Internal industry documents released during the 1998 Master Settlement Agreement revealed major tobacco companies knew their products caused cancer as early as the 1950s, running coordinated decades-long campaigns to suppress evidence and fund misleading research.",
+   sources:[
+     {text:"UCSF Truth Tobacco Industry Documents Archive",url:"https://www.industrydocuments.ucsf.edu/tobacco/"},
+     {text:"Master Settlement Agreement (1998)",url:"https://www.naag.org/our-work/naag-center-for-tobacco-and-public-health/the-master-settlement-agreement/"}
+   ],
+   tags:["Big Tobacco","Corporate","Cancer","Suppression","Proven","Philip Morris"]},
+
+  {id:"s10",title:"Operation Mockingbird — CIA Media Infiltration",cat:"Government",year:1950,credibility:82,
+   wikiSlug:"Operation_Mockingbird",seeded:true,
+   desc:"An alleged CIA program to influence domestic and foreign media during the Cold War. Church Committee investigations in the 1970s confirmed that the CIA maintained relationships with journalists and major media organizations for propaganda purposes.",
+   sources:[
+     {text:"Church Committee Reports (1975–76)",url:"https://www.intelligence.senate.gov/"}
+   ],
+   tags:["CIA","Media","Propaganda","Church Committee","Cold War"]},
+
+  {id:"s11",title:"ECHELON — Global Signals Intelligence Network",cat:"Surveillance",year:1971,credibility:85,
+   wikiSlug:"ECHELON",seeded:true,
+   desc:"A global signals intelligence interception network operated by the Five Eyes alliance (US, UK, Canada, Australia, New Zealand) capable of intercepting civilian phone calls, faxes, and internet traffic worldwide. Confirmed by a European Parliament investigation in 2001.",
+   sources:[
+     {text:"European Parliament ECHELON Inquiry Report (2001)",url:"https://www.europarl.europa.eu/sides/getDoc.do?pubRef=-//EP//NONSGML+REPORT+A5-2001-0264+0+DOC+PDF+V0//EN"},
+     {text:"The Intercept — NSA SIGINT (Snowden docs)",url:"https://theintercept.com/snowden-sidtoday/"}
+   ],
+   tags:["NSA","Five Eyes","SIGINT","Confirmed","Global","Cold War"]},
+
+  {id:"s12",title:"Project ARTICHOKE — CIA Interrogation Experiments",cat:"Government",year:1951,credibility:80,
+   wikiSlug:"Project_ARTICHOKE",seeded:true,
+   desc:"A CIA predecessor to MKUltra, Project ARTICHOKE explored hypnosis, LSD, morphine, and other techniques to control human behavior during interrogations, including attempts to create 'amnesia barriers' in subjects. Confirmed via partially declassified CIA documents.",
+   sources:[
+     {text:"CIA FOIA — Project ARTICHOKE",url:"https://www.cia.gov/readingroom/document/cia-rdp70-00058r000100100001-9"},
+     {text:"Senate Select Committee on Intelligence, 1977",url:"https://www.intelligence.senate.gov/sites/default/files/94755_I.pdf"}
+   ],
+   tags:["CIA","Hypnosis","Interrogation","Cold War","Partially Declassified"]}
+];
+
+/* ─────────────────────────────────────────
+   AUTO-ANALYSIS HELPERS
+───────────────────────────────────────── */
+const CAT_KW={
+  Government:["cia","fbi","nsa","government","congress","senate","president","federal","operation","project","white house","pentagon","intelligence","covert","clandestine","agency","bureau"],
+  Military:["military","army","navy","war","combat","weapon","missile","bomb","soldier","air force","nuclear","nato","troops","attack","operation","battalion","regiment","fleet"],
+  Surveillance:["surveillance","monitor","intercept","spy","wiretap","prism","nsa","signal","tracking","data collect","eavesdrop","echelon","gchq","sigint","humint","watch list"],
+  Medical:["medical","health","experiment","drug","disease","vaccine","hospital","doctor","clinical","pharma","treatment","cancer","patient","trial","radiation","chemical","biological"],
+  Corporate:["corporate","company","tobacco","oil","bank","wall street","pharmaceutical","industry","business","financial","exxon","enron","settlement","fraud","executive","profit"],
+  Technology:["technology","internet","data","software","computer","algorithm","social media","facebook","google","twitter","tech","silicon valley","encryption","cyber","digital","app"],
+  Historical:["assassination","jfk","mlk","lincoln","watergate","scandal","cold war","wwii","vietnam","korea","coverup","1960","1970","1950","1940","1930","1920","century","historic"],
+  Science:["ufo","alien","space","nasa","moon","chemtrail","haarp","weather","climate","flat earth","area 51","extraterrestrial","phenomenon","anomaly","radiation","atmospheric"],
+  Political:["political","election","vote","party","republican","democrat","campaign","lobbying","corruption","politician","congress","senate","parliament","regime","coup","propaganda"],
+  Financial:["federal reserve","banking","gold","currency","rothschild","bilderberg","illuminati","new world order","economy","hedge fund","derivatives","reserve","treasury","monetary"]
+};
+
+function guessCategory(title,extract){
+  const text=(title+' '+(extract||'')).toLowerCase();
+  let best='Other',bestScore=0;
+  for(const[cat,kws] of Object.entries(CAT_KW)){
+    const score=kws.filter(k=>text.includes(k)).length;
+    if(score>bestScore){bestScore=score;best=cat}
+  }
+  return best;
+}
+function guessYear(extract){
+  if(!extract)return null;
+  const m=extract.match(/\b(19[0-9]{2}|20[0-2][0-9])\b/);
+  return m?parseInt(m[1]):null;
+}
+function guessCredibility(title,extract){
+  const text=(title+' '+(extract||'')).toLowerCase();
+  if(/\bconfirmed\b|\bproven\b|\bdeclassified\b|\badmitted\b|\backnowledged\b|\bsentenced\b|\bconvicted\b/.test(text))
+    return 85+Math.floor(Math.random()*14);
+  if(/\ballege[sd]?\b|\bclaim[sed]?\b|\bsuggest[s]?\b|\breportedly\b|\bdisputed\b|\bunproven\b/.test(text))
+    return 45+Math.floor(Math.random()*25);
+  if(/\bconspiracy theory\b|\bdebunked\b|\bfalse\b|\bmyth\b/.test(text))
+    return 20+Math.floor(Math.random()*35);
+  return 60+Math.floor(Math.random()*20);
+}
+function guessTags(title,extract){
+  const text=(title+' '+(extract||'')).toLowerCase();
+  const tags=[];
+  if(/\bcia\b/.test(text))tags.push('CIA');
+  if(/\bfbi\b/.test(text))tags.push('FBI');
+  if(/\bnsa\b/.test(text))tags.push('NSA');
+  if(/cold war/.test(text))tags.push('Cold War');
+  if(/\bconfirmed\b|\bproven\b|\bdeclassified\b/.test(text))tags.push('Confirmed');
+  if(/\bdisputed\b|\balleg/.test(text))tags.push('Disputed');
+  if(/surveillance/.test(text))tags.push('Surveillance');
+  if(/\bmilitary\b|\barmy\b|\bnavy\b/.test(text))tags.push('Military');
+  if(/medical|health|experiment/.test(text))tags.push('Medical');
+  if(/corporate|company|industry/.test(text))tags.push('Corporate');
+  if(/false flag/.test(text))tags.push('False Flag');
+  if(/assassination/.test(text))tags.push('Assassination');
+  if(/nuclear/.test(text))tags.push('Nuclear');
+  if(/\bufo\b|\balien\b/.test(text))tags.push('UFO');
+  if(/\bfoia\b/.test(text))tags.push('FOIA');
+  if(/\bsurveillance\b|\bspy\b|\bintercept\b/.test(text))tags.push('Spying');
+  return [...new Set(tags)].slice(0,5);
+}
+
+/* ─────────────────────────────────────────
+   STATE
+───────────────────────────────────────── */
+let allTheories=[...SEEDED];
+let wikiQueue=[...WIKI_QUEUE];
+let activeCat="All",sortMode="cred",expanded=null,query="";
+let fetchingDone=false;
+const BATCH_SIZE=10;
+const seededSlugs=new Set(SEEDED.map(s=>s.wikiSlug.toLowerCase().replace(/_/g,' ')));
+
+/* ─────────────────────────────────────────
+   WIKIPEDIA FETCHER
+───────────────────────────────────────── */
+async function fetchBatch(slugs){
+  const titles=slugs.map(s=>s.replace(/_/g,' ')).join('|');
+  const url=`https://en.wikipedia.org/w/api.php?`+
+    `action=query&titles=${encodeURIComponent(titles)}&prop=extracts&`+
+    `exintro=true&explaintext=true&exsentences=5&format=json&origin=*&redirects=1`;
+  try{
+    const r=await fetch(url,{signal:AbortSignal.timeout(8000)});
+    if(!r.ok)return[];
+    const d=await r.json();
+    const pages=Object.values(d.query.pages);
+    return pages
+      .filter(p=>p.extract&&p.extract.length>80&&!p.missing&&!p.invalid)
+      .map(p=>{
+        const slug=p.title.replace(/ /g,'_');
+        const ex=p.extract||'';
+        const cat=guessCategory(p.title,ex);
+        const year=guessYear(ex);
+        const cred=guessCredibility(p.title,ex);
+        const tags=guessTags(p.title,ex);
+        const desc=ex.length>700?ex.slice(0,700)+'…':ex;
+        return{
+          id:'w_'+p.pageid,title:p.title,cat,year,credibility:cred,
+          wikiSlug:slug,desc,sources:[],tags,fromWiki:true
+        };
+      });
+  }catch(e){return[]}
+}
+
+async function loadNextBatch(){
+  if(wikiQueue.length===0){
+    setFetchDone();return;
+  }
+  const btn=document.getElementById('loadMoreBtn');
+  if(btn){btn.disabled=true;btn.textContent='[ DECRYPTING... ]'}
+
+  const batch=wikiQueue.splice(0,BATCH_SIZE);
+  const total=WIKI_QUEUE.length;
+  const done=total-wikiQueue.length-batch.length;
+  setStatus(`DECRYPTING FILES... ${done}/${total} PROCESSED`,Math.round(done/total*100));
+
+  const results=await fetchBatch(batch);
+  const existingTitles=new Set(allTheories.map(t=>t.title.toLowerCase()));
+  const novel=results.filter(r=>{
+    const tl=r.title.toLowerCase();
+    if(existingTitles.has(tl))return false;
+    if(seededSlugs.has(tl))return false;
+    return true;
+  });
+  novel.forEach(n=>existingTitles.add(n.title.toLowerCase()));
+  allTheories=[...allTheories,...novel];
+
+  const processed=total-wikiQueue.length;
+  const pct=Math.round(processed/total*100);
+  setStatus(`DECRYPTING FILES... ${processed}/${total} PROCESSED (${allTheories.length} FILES ACTIVE)`,pct);
+  render();
+
+  if(wikiQueue.length>0){
+    if(btn){btn.disabled=false;btn.textContent='[ DECRYPT MORE FILES ↓ ]'}
+    document.getElementById('loadMoreWrap').style.display='block';
+    setTimeout(()=>loadNextBatch(),400);
+  }else{
+    setFetchDone();
+  }
+}
+
+function setFetchDone(){
+  fetchingDone=true;
+  document.getElementById('loadMoreWrap').style.display='none';
+  const p=document.getElementById('pulseEl');
+  p.className='pulse done';
+  setStatus(`✓ ARCHIVE COMPLETE — ${allTheories.length} FILES LOADED`,100,true);
+  render();
+}
+
+function setStatus(msg,pct=0,done=false){
+  document.getElementById('statusText').textContent=msg;
+  const fill=document.getElementById('progressFill');
+  fill.style.width=pct+'%';
+  if(done)fill.className='progress-bar-fill done';
+}
+
+/* ─────────────────────────────────────────
+   UI
+───────────────────────────────────────── */
+function meterColor(v){return v>=85?'#7dc843':v>=60?'#c8a020':'#c0392b'}
+function credLabel(v){return v>=90?'CONFIRMED':v>=75?'HIGH CONF.':v>=50?'MODERATE':'DISPUTED'}
+
+function buildCatBar(){
+  const counts={All:allTheories.length};
+  CATS.slice(1).forEach(c=>{counts[c]=allTheories.filter(t=>t.cat===c).length});
+  document.getElementById('catBar').innerHTML=CATS
+    .filter(c=>c==='All'||counts[c]>0)
+    .map(c=>`<button class="cat-btn${activeCat===c?' active':''}" onclick="setCat('${c}')">
+      ${c.toUpperCase()} <span style="opacity:.5;font-size:7px">(${counts[c]})</span>
+    </button>`).join('');
+}
+
+function buildStats(){
+  const confirmed=allTheories.filter(t=>t.credibility>=90).length;
+  const disputed=allTheories.filter(t=>t.credibility<50).length;
+  const wiki=allTheories.filter(t=>t.fromWiki).length;
+  const seeded=allTheories.filter(t=>t.seeded).length;
+  document.getElementById('statsRow').innerHTML=[
+    `TOTAL FILES: <span>${allTheories.length}</span>`,
+    `CONFIRMED: <span>${confirmed}</span>`,
+    `DISPUTED: <span>${disputed}</span>`,
+    `CURATED: <span>${seeded}</span>`,
+    `WIKI-SOURCED: <span>${wiki}</span>`,
+    `CATEGORIES: <span>${CATS.slice(1).filter(c=>allTheories.some(t=>t.cat===c)).length}</span>`
+  ].map(s=>`<div class="stat-pill">${s}</div>`).join('');
+}
+
+function setCat(c){activeCat=c;expanded=null;render()}
+function setSort(s){
+  sortMode=s;
+  ['cred','year','alpha'].forEach(x=>{
+    document.getElementById('sort'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active',x===s);
+  });
+  render();
+}
+function onSearch(){
+  query=document.getElementById('searchInput').value.toLowerCase();
+  document.getElementById('clearBtn').className='clear-btn'+(query?' vis':'');
+  expanded=null;render();
+}
+function clearSearch(){
+  document.getElementById('searchInput').value='';
+  query='';document.getElementById('clearBtn').className='clear-btn';render();
+}
+function toggle(id){expanded=expanded===id?null:id;render()}
+
+function render(){
+  buildCatBar();buildStats();
+  let filtered=allTheories.filter(t=>{
+    const catOk=activeCat==='All'||t.cat===activeCat;
+    const qOk=!query||
+      t.title.toLowerCase().includes(query)||
+      (t.desc||'').toLowerCase().includes(query)||
+      (t.tags||[]).some(tag=>tag.toLowerCase().includes(query));
+    return catOk&&qOk;
+  });
+
+  if(sortMode==='cred')filtered.sort((a,b)=>b.credibility-a.credibility);
+  else if(sortMode==='year')filtered.sort((a,b)=>(a.year||9999)-(b.year||9999));
+  else filtered.sort((a,b)=>a.title.localeCompare(b.title));
+
+  document.getElementById('resultCount').textContent=
+    `${filtered.length} FILE${filtered.length!==1?'S':''} FOUND`;
+  document.getElementById('totalBadge').textContent=`${allTheories.length} FILES`;
+
+  const list=document.getElementById('theoryList');
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty"><span class="empty-icon">⊘</span>[ NO MATCHING FILES IN DATABASE ]<br><br>REFINE SEARCH OR CLEAR FILTERS</div>`;
+    return;
+  }
+
+  list.innerHTML=filtered.map(t=>{
+    const cc=CAT_COLORS[t.cat]||CAT_COLORS.Other;
+    const isOpen=expanded===t.id;
+    const mc=meterColor(t.credibility);
+    const wikiUrl=`https://en.wikipedia.org/wiki/${t.wikiSlug||t.title.replace(/ /g,'_')}`;
+    return `<div class="card${isOpen?' open':''}" onclick="toggle('${t.id}')">
+      <div class="card-header">
+        <div class="card-main">
+          <div class="card-top">
+            <span class="cat-badge" style="background:${cc.bg};border:1px solid ${cc.border};color:${cc.text}">${t.cat.toUpperCase()}</span>
+            ${t.year?`<span class="year-tag">EST. ${t.year}</span>`:''}
+            ${t.seeded?`<span style="font-size:7px;color:var(--green-dim);letter-spacing:1px">★ CURATED</span>`:''}
+            ${t.fromWiki?`<span class="wiki-tag">◈ WIKI</span>`:''}
+          </div>
+          <div class="card-title">${t.title}</div>
+          <div class="card-meta">
+            <div class="meter-group">
+              <span class="meter-label">CREDIBILITY</span>
+              <div class="meter-bar"><div class="meter-fill" style="width:${t.credibility}%;background:${mc}"></div></div>
+              <span class="meter-score" style="color:${mc}">${credLabel(t.credibility)} (${t.credibility}%)</span>
+            </div>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      ${isOpen?`<div class="card-body" onclick="event.stopPropagation()">
+        <p class="card-desc">${(t.desc||'No description available.').replace(/</g,'&lt;')}</p>
+        ${t.sources&&t.sources.length?`
+          <div class="sources-head">PRIMARY SOURCES</div>
+          ${t.sources.map(s=>`<div class="source-item">
+            <span class="source-bullet">▣</span>
+            <span class="source-text">${s.text}
+              <span class="source-link" onclick="event.stopPropagation();window.open('${s.url}','_blank')">OPEN ↗</span>
+            </span>
+          </div>`).join('')}`:''}
+        <span class="wiki-read-link" onclick="event.stopPropagation();window.open('${wikiUrl}','_blank')">◈ READ FULL WIKIPEDIA ARTICLE ↗</span>
+        <div class="tags">${(t.tags||[]).map(tag=>`<span class="tag">${tag}</span>`).join('')}</div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ─────────────────────────────────────────
+   BOOT
+───────────────────────────────────────── */
+render();
+loadNextBatch();
+</script>
+</body>
+</html>
