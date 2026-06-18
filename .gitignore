@@ -1,0 +1,54 @@
+# ─────────────────────────────────────────
+# DECLASSIFIED ARCHIVE — .gitignore
+# ─────────────────────────────────────────
+
+# OS FILES
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# EDITORS & IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# LOGS
+*.log
+logs/
+npm-debug.log*
+
+# DEPENDENCIES (just in case)
+node_modules/
+.npm/
+
+# ENV FILES
+.env
+.env.local
+.env.*.local
+
+# BUILD OUTPUT
+dist/
+build/
+out/
+
+# TEMP FILES
+*.tmp
+*.temp
+.cache/
+
+# SCREENSHOTS (keep repo clean, add manually)
+screenshots/
+*.png
+*.jpg
+*.jpeg
+*.gif
+!assets/**
