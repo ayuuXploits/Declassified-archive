@@ -16,8 +16,8 @@ and government programs — sourced from Wikipedia, Senate reports, and FOIA rel
 
 <br/>
 
-[![Live Demo](https://img.shields.io/badge/🌐%20LIVE%20DEMO-ayuuXploits.github.io-7dc843?style=for-the-badge&logoColor=white)](https://ayuuXploits.github.io/declassified-archive)
-[![GitHub](https://img.shields.io/badge/GITHUB-ayuuXploits-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ayuuXploits/declassified-archive)
+[![Live Demo](https://img.shields.io/badge/🌐%20LIVE%20DEMO-ayuuXploits.github.io-7dc843?style=for-the-badge&logoColor=white)](https://ayuuXploits.github.io/Declassified-archive)
+[![GitHub](https://img.shields.io/badge/GITHUB-ayuuXploits-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ayuuXploits/Declassified-archive)
 [![License](https://img.shields.io/badge/LICENSE-MIT-4a7a28?style=for-the-badge)](LICENSE)
 
 <br/>
@@ -57,7 +57,7 @@ The credibility meter isn't a guess — it reflects the actual weight of documen
 
 <div align="center">
 
-### 🌐 [ayuuXploits.github.io/declassified-archive](https://ayuuXploits.github.io/declassified-archive)
+### 🌐 [ayuuXploits.github.io/Declassified-archive](https://ayuuXploits.github.io/Declassified-archive)
 
 *No installation. No server. Opens instantly in any browser.*
 
