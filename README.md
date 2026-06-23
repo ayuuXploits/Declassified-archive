@@ -88,6 +88,7 @@ The credibility meter isn't a guess — it reflects the actual weight of documen
 ```bash
 # Download the-dossier.html and open it in any browser
 open the-dossier.html
+
 ```
 
 **Option 2 — Clone and run:**
