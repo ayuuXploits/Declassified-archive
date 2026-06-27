@@ -143,6 +143,7 @@ SCORE    BAR                   LABEL        MEANING
 75–89%   ████████░░  GREEN     HIGH CONF.   Multiple credible sources, partial declassification  
 50–74%   █████░░░░░  AMBER     MODERATE     Credible allegations, some corroboration
 00–49%   ██░░░░░░░░  RED       DISPUTED     Limited evidence, contested, or debunked
+
 ```
 
 **Signals used to infer score from Wikipedia text:**
