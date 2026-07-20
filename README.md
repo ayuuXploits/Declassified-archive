@@ -13,13 +13,11 @@
 
 <p><strong>A live intelligence archive of real declassified operations, confirmed conspiracies,<br/>
 and government programs — sourced from Wikipedia, Senate reports, and FOIA releases.</strong></p>
-
 <br/>
 
 [![Live Demo](https://img.shields.io/badge/🌐%20LIVE%20DEMO-ayuuXploits.github.io-7dc843?style=for-the-badge&logoColor=white)](https://ayuuXploits.github.io/Declassified-archive)
 [![GitHub](https://img.shields.io/badge/GITHUB-ayuuXploits-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ayuuXploits/Declassified-archive)
 [![License](https://img.shields.io/badge/LICENSE-MIT-4a7a28?style=for-the-badge)](LICENSE)
-
 <br/>
 
 ![Files](https://img.shields.io/badge/INTELLIGENCE%20FILES-100%2B-c8a020?style=for-the-badge)
