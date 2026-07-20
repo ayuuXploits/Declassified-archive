@@ -89,6 +89,7 @@ The credibility meter isn't a guess — it reflects the actual weight of documen
 # Download the-dossier.html and open it in any browser
 open the-dossier.html
 
+
 ```
 
 **Option 2 — Clone and run:**
@@ -167,6 +168,7 @@ SCORE    BAR                   LABEL        MEANING
 │  BUNDLE SIZE       ~1 file / ~700 lines              │
 │  DEPLOYMENT        GitHub Pages / Any static host    │
 └──────────────────────────────────────────────────────┘
+
 ```
 
 **Wikipedia API endpoint:**
