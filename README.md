@@ -192,6 +192,7 @@ declassified-archive/
 ├── the-dossier.html      ← Entire application (HTML + CSS + JS in one file)
 ├── README.md             ← This file
 └── LICENSE               ← MIT License
+
 ```
 
 ---
